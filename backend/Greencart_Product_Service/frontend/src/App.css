@@ -2,46 +2,18 @@
 
 .navbar {
   display: flex;
-  justify-content: space-between; /* left + right */
-  align-items: center;
+  justify-content: center; /* center links horizontally */
   background-color: #4CAF50; /* green bar */
-  padding: 12px 24px;
+  padding: 15px 0;
   box-shadow: 0 2px 6px rgba(0,0,0,0.2);
   font-family: Arial, sans-serif;
 }
 
-/* Left side: cart + brand */
-.nav-left {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.cart-icon {
-  font-size: 26px;
-  color: white;
-}
-
-
-.brand-name {
-  font-size: 20px;
-  font-weight: bold;
-  color: white;
-}
-
-
-/* Right side: login/register */
-.nav-right {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-}
-
-/* Navbar links */
 .navbar a {
   color: white;
   text-decoration: none;
-  padding: 8px 18px;
+  padding: 10px 20px;
+  margin: 0 10px;
   font-weight: bold;
   border-radius: 5px;
   transition: background-color 0.3s, transform 0.2s;
