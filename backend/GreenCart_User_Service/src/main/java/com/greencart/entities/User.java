@@ -11,6 +11,8 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -49,7 +51,7 @@ public class User {
 
     // FK → roles table
     @Column(name = "role_id", nullable = false)
-    private int roleId;
+    private Integer roleId;
 
     @Column(name = "aadhaar_no", length = 12)
     private String aadhaarNo;
@@ -61,16 +63,25 @@ public class User {
     private String phone;
 
     // FK → areas table
-    @Column(name = "area_id")
-    private int areaId;
+    @Column(name = "city")
+    private String city;
+    
 
+    
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
-    private UserStatus status = UserStatus.ACTIVE;
+    private UserStatus status;
 
-    // FK → security_questions table
-    @Column(name = "question_id")
-    private int questionId;
+  
+//    // FK → security_questions table
+//    @Column(name = "question_id")
+//    private Integer questionId;
+    
+    @ManyToOne
+    @JoinColumn(name = "question_id")
+    private SecurityQuestion question;
+
+
 
     @Column(name = "answer", length = 255, nullable = false)
     private String answer;

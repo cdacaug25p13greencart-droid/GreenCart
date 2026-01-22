@@ -11,6 +11,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import FarmerDashboard from "./pages/farmer/FarmerDashboard";
+import ForgotPassword from "./pages/ForgotPassword";
 
 import "./App.css";
 import { FaShoppingCart } from "react-icons/fa";
@@ -58,6 +59,7 @@ function Layout() {
 
       <Routes>
         <Route path="/login" element={<Login />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/register" element={<Register />} />
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/farmer" element={<FarmerDashboard />} />

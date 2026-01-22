@@ -9,5 +9,20 @@ export const getSecurityQuestions = () => {
 };
 
 export const loginUser = (data) => {
-  return api.post("/seller/login", data);
+  return api.post("/user/login", data);
+};
+
+export const verifySecurityAnswer = (data) => {
+  return api.post("/user/forgot-password/verify", data);
+};
+
+export const resetPassword = (data) => {
+  return api.post("/user/forgot-password/reset", data);
+};
+
+// Fetch security question for a specific user (forgot password)
+export const getUserSecurityQuestion = (email) => {
+  return api.get("/user/forgot-password/question", {
+    params: { email }
+  });
 };

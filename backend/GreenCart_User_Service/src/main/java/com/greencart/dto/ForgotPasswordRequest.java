@@ -1,4 +1,4 @@
-package com.greencart.entities;
+package com.greencart.dto;
 
 import lombok.Getter;
 import lombok.Setter;

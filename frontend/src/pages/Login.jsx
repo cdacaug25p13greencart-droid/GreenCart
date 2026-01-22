@@ -1,10 +1,12 @@
 import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { loginUser } from "../services/authService";
 import "./Login.css";
 
 export default function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
 
   const handleLogin = (e) => {
     e.preventDefault();
@@ -15,21 +17,18 @@ export default function Login() {
     }
 
     loginUser({ username, password })
-      .then(res => alert("Welcome " + res.data.username))
+      .then(res => {
+        alert("Welcome " + res.data.username);
+        // Navigate based on role or default dashboard
+        navigate("/");
+      })
       .catch(err => alert(err.response?.data?.message || "Login failed"));
-  };
-
-  const handleForgotPassword = () => {
-    const emailOrUsername = prompt("Enter your username or email to reset password:");
-    if (emailOrUsername) {
-     
-      alert(`Password reset link sent to ${emailOrUsername}`);
-    }
   };
 
   return (
     <div className="login-container">
       <h2>Login</h2>
+      <br />
       <form onSubmit={handleLogin}>
         <label>Username</label>
         <input
@@ -51,10 +50,9 @@ export default function Login() {
 
         <button type="submit">Login</button>
 
-        
-        <p className="forgot-password" onClick={handleForgotPassword}>
+        <Link to="/forgot-password" className="forgot-password-link">
           Forgot Password?
-        </p>
+        </Link>
       </form>
     </div>
   );
