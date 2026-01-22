@@ -2,7 +2,16 @@
 
 import "./Register.css";
 import { useState, useEffect } from "react";
-import { registerUser, getSecurityQuestions } from "../services/authService";
+// import { registerUser, getSecurityQuestions } from "../services/authService";
+// import { getCities, getAreasByCity } from "../services/authService";
+import {
+  registerUser,
+  getSecurityQuestions,
+  getCities,
+  getAreasByCity
+} from "../services/authService";
+
+
 
 export default function Register() {
   const [username, setUsername] = useState("");
@@ -17,6 +26,14 @@ export default function Register() {
   const [questionId, setQuestionId] = useState("");  
   const [questions, setQuestions] = useState([]);
   const [answer, setAnswer] = useState("");
+  const [errors, setErrors] = useState({});
+
+ const [cities, setCities] = useState([]);
+  const [areas, setAreas] = useState([]);
+  const [cityId, setCityId] = useState("");
+  const [areaId, setAreaId] = useState("");
+
+
 
   useEffect(() => {
     getSecurityQuestions()
@@ -24,8 +41,37 @@ export default function Register() {
       .catch(() => alert("Failed to load security questions"));
   }, []);
 
+  // useEffect(() => {
+  //   getCities()
+  //     .then(res => setCities(res.data))
+  //     .catch(() => console.log("Failed to load cities"));
+  // }, []);
+
+  useEffect(() => {
+  getCities()
+    .then(res => {
+      console.log("Cities API response:", res.data);
+      setCities(res.data);
+    })
+    .catch(() => console.log("Failed to load cities"));
+}, []);
+
+
+  useEffect(() => {
+    if (cityId) {
+      getAreasByCity(cityId)
+        .then(res => setAreas(res.data))
+        .catch(() => console.log("Failed to load areas"));
+    } else {
+      setAreas([]);
+      setAreaId("");
+    }
+  }, [cityId]);
+
+
+
   const handleSubmit = (e) => {
-    e.preventDefault();
+    /*e.preventDefault();
 
     if (!username || !password || !roleId || !questionId || !answer) {
       alert("Please fill all required fields!");
@@ -41,32 +87,164 @@ export default function Register() {
       roleId: Number(roleId),
       questionId: Number(questionId),
       answer
-    });
-    registerUser({
+    });*/
+
+    e.preventDefault();
+
+  let newErrors = {};
+
+  // 1️⃣ Username
+  if (!username || username.length < 5 || username.length > 20) {
+    newErrors.username = "Username must be 5–20 characters";
+  }
+
+  // 2️⃣ Password
+  if (!password || password.length < 8 || password.length > 16) {
+    newErrors.password = "Password must be 8–16 characters";
+  }
+
+  // 3️⃣ First Name
+  if (!firstName || !/^[A-Za-z]{2,30}$/.test(firstName)) {
+    newErrors.firstName = "First name must contain only alphabets (2–30 chars)";
+  }
+
+  // 4️⃣ Last Name
+  if (!lastName || !/^[A-Za-z]{2,30}$/.test(lastName)) {
+    newErrors.lastName = "Last name must contain only alphabets (2–30 chars)";
+  }
+
+  // 5️⃣ Role
+  if (!roleId) {
+    newErrors.roleId = "Please select a role";
+  }
+
+  // 6️⃣ Email
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    newErrors.email = "Enter a valid email address";
+  }
+
+  // 7️⃣ Phone
+  if (!phone || !/^[6-9]\d{9}$/.test(phone)) {
+    newErrors.phone = "Phone must be 10 digits and not start with 0";
+  }
+
+  // 8️⃣ City
+if (!cityId) {
+  newErrors.city = "Please select a city";
+}
+
+ // 8️⃣ Area
+if (!areaId) {
+  newErrors.area = "Please select an area";
+}
+
+  // 9️⃣ Security Question
+  if (!questionId) {
+    newErrors.questionId = "Please select a security question";
+  }
+
+  // 🔟 Answer
+  if (!answer || answer.trim().length < 2) {
+    newErrors.answer = "Answer must be at least 2 characters";
+  }
+
+  // Aadhaar (Farmer only)
+  if (roleId === "2" && !aadhaarNo) {
+    newErrors.aadhaarNo = "Aadhaar number is required for Farmer";
+  }
+
+  if (Object.keys(newErrors).length > 0) {
+    setErrors(newErrors);
+    return;
+  }
+
+      console.log("Register payload →", {
       username,
-      password,
-      firstName,
-      lastName,
-      email,
-      phone,
       roleId: Number(roleId),
-      aadhaarNo: roleId === "2" ? aadhaarNo : undefined,
-      city,
       questionId: Number(questionId),
       answer
-    })
-.then(() => {
-  alert("Registered successfully");
-  navigate("/login");
-})
-.catch(err => {
-  alert(err.response?.data || "Registration failed");
-});
+    });
+
+  setErrors({});
+
+    //   registerUser({
+    //     username,
+    //     password,
+    //     firstName,
+    //     lastName,
+    //     roleId: Number(roleId),
+    //     aadhaarNo: roleId === "2" ? aadhaarNo : null,
+    //     email,
+    //     phone,
+    //     areaId: Number(areaId),          // ✅ REQUIRED
+    //     questionId: Number(questionId),
+    //     answer: answer.trim()
+    //   })
+    //   .then(() => {
+    //     alert("Registered successfully");
+    //     navigate("/login");
+    //   })
+    //  .catch(err => {
+    //   let msg = "Registration failed";
+
+    //   if (err.response?.data) {
+    //     if (typeof err.response.data === "string") {
+    //       msg = err.response.data;
+    //     } else if (err.response.data.message) {
+    //       msg = err.response.data.message;
+    //     } else if (err.response.data.error) {
+    //       msg = err.response.data.error;
+    //     }
+    //   }
+
+    //   setErrors({ api: msg });
+    // });
+
+
+    registerUser({
+        username,
+        password,
+        firstName,
+        lastName,
+        roleId: Number(roleId),
+        aadhaarNo: roleId === "2" ? aadhaarNo : null,
+        email,
+        phone,
+        areaId: Number(areaId),
+        questionId: Number(questionId),
+        answer: answer.trim()
+      })
+      .then(() => {
+        alert("Registered successfully");
+        navigate("/login");
+      })
+      .catch(err => {
+      const message =
+        typeof err.response?.data === "string"
+          ? err.response.data
+          : err.response?.data?.message || "Registration failed";
+
+      setErrors({ api: message });
+    });
+
+
+
+
   };
 
   return (
     <div className="form-container">
       <h2>Register</h2>
+
+      {/* Error msg prints here */}
+      {Object.keys(errors).length > 0 && (
+        <div style={{ color: "orange", marginBottom: "10px", fontSize: "13px" }}>
+          {Object.values(errors).map((err, index) => (
+            <div key={index}>{err}</div>
+          ))}
+        </div>
+      )}
+
 
       <form onSubmit={handleSubmit}>
         <label>Username</label>
@@ -139,11 +317,40 @@ export default function Register() {
         />
 
         <label>City</label>
-        <input
-          type="text"
-          value={city}
-          onChange={e => setCity(e.target.value)}
-        />
+        <select
+          value={cityId}
+          onChange={e => setCityId(e.target.value)}
+          required
+        >
+          <option value="">Select City</option>
+          {cities.map(city => (
+            <option key={city.cityId} value={city.cityId}>
+              {city.cityName}
+            </option>
+          ))}
+        </select>
+
+          <label>Area</label>
+          <select
+            value={areaId}
+            onChange={e => setAreaId(e.target.value)}
+            disabled={!cityId}
+            required
+          >
+            <option value="">Select Area</option>
+            {areas.map(area => (
+              <option key={area.areaId} value={area.areaId}>
+                {area.areaName}
+              </option>
+            ))}
+          </select>
+            
+
+
+        {errors.city && (
+          <p style={{ color: "orange", fontSize: "12px" }}>{errors.city}</p>
+        )}
+
 
         <label>Security Question</label>
 

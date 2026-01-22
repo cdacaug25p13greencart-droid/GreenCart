@@ -8,6 +8,7 @@ import com.greencart.entities.Area;
 
 public interface AreaRepo extends JpaRepository<Area, Integer> {
 	
-	List<Area> findByCityId(Integer city_id);
+
+	List<Area> findByCityCityId(Integer cityId);
 
 }

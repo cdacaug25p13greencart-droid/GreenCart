@@ -1,7 +1,7 @@
 import api from "../api/api";
 
 export const registerUser = (data) => {
-  return api.post("/seller/register", data);
+  return api.post("/user/register", data);
 };
 
 export const getSecurityQuestions = () => {
@@ -25,4 +25,13 @@ export const getUserSecurityQuestion = (email) => {
   return api.get("/user/forgot-password/question", {
     params: { email }
   });
+};
+
+// ✅ FIXED: use api instead of axios
+export const getCities = () => {
+  return api.get("/location/cities");
+};
+
+export const getAreasByCity = (cityId) => {
+  return api.get(`/location/areas/${cityId}`);
 };

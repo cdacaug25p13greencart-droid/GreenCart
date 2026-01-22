@@ -21,8 +21,13 @@ public class LocationService {
         return cityrepo.findAll();
     }
 
+//    public List<Area> getAreasByCity(Integer cityId) {
+//        return arearepo.findByCityCityId(cityId);
+//    }
+    
     public List<Area> getAreasByCity(Integer cityId) {
-        return arearepo.findByCityId(cityId);
+        return arearepo.findByCityCityId(cityId); // ✅ CORRECT
     }
+
 
 }

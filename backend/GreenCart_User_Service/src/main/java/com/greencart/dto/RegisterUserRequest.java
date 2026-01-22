@@ -15,7 +15,8 @@ public class RegisterUserRequest {
     private String aadhaarNo;
     private String email;
     private String phone;
-    private String city;
+    
+    private Integer areaId;
 
     private Integer questionId;   // 👈 IMPORTANT
     private String answer;

@@ -7,9 +7,11 @@ import com.greencart.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.greencart.entities.Area;
 import com.greencart.entities.SecurityQuestion;
 import com.greencart.entities.User;
 import com.greencart.enums.UserStatus;
+import com.greencart.repositories.AreaRepo;
 import com.greencart.repositories.SecurityQuestionRepo;
 import com.greencart.repositories.UserRepo;
 
@@ -21,6 +23,9 @@ public class UserServices {
 	
     @Autowired
 	SecurityQuestionRepo questionRepo;
+    
+    @Autowired
+    AreaRepo arearepo;
 
 	public List<User> getAll() {
 		return userrepo.findAll();
@@ -52,6 +57,10 @@ public class UserServices {
 	
 	public User registerUser(RegisterUserRequest request) {
 
+	    if (request.getAreaId() == null) {
+	        throw new RuntimeException("Area is required");
+	    }
+
 	    User user = new User();
 
 	    user.setUsername(request.getUsername());
@@ -62,22 +71,23 @@ public class UserServices {
 	    user.setAadhaarNo(request.getAadhaarNo());
 	    user.setEmail(request.getEmail());
 	    user.setPhone(request.getPhone());
-	    user.setCity(request.getCity());
 	    user.setAnswer(request.getAnswer());
 
-	    // ✅ STATUS LOGIC
-	    if (request.getRoleId() == 2) {
-	        user.setStatus(UserStatus.PENDING);
-	    } else {
-	        user.setStatus(UserStatus.ACTIVE);
-	    }
+	    user.setStatus(
+	        request.getRoleId() == 2
+	            ? UserStatus.PENDING
+	            : UserStatus.ACTIVE
+	    );
 
-	    // ✅ FETCH SECURITY QUESTION ENTITY
-	    SecurityQuestion question =
-	        questionRepo.findById(request.getQuestionId())
-	            .orElseThrow(() -> new RuntimeException("Invalid question"));
-
+	    SecurityQuestion question = questionRepo
+	        .findById(request.getQuestionId())
+	        .orElseThrow(() -> new RuntimeException("Invalid question"));
 	    user.setQuestion(question);
+
+	    Area area = arearepo
+	        .findById(request.getAreaId())
+	        .orElseThrow(() -> new RuntimeException("Invalid area"));
+	    user.setArea(area);
 
 	    return userrepo.save(user);
 	}

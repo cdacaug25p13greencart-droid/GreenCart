@@ -2,12 +2,14 @@ package com.greencart.entities;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.greencart.enums.UserStatus;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -62,10 +64,11 @@ public class User {
     @Column(name = "phone", length = 15)
     private String phone;
 
-    // FK → areas table
-    @Column(name = "city")
-    private String city;
     
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "area_id")
+    @JsonIgnore   // optional, prevents infinite recursion in JSON
+    private Area area;
 
     
     @Enumerated(EnumType.STRING)
