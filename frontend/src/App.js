@@ -4,17 +4,34 @@ import {
   Routes,
   Route,
   NavLink,
-  useLocation
+  useLocation,
+  Navigate
 } from "react-router-dom";
+import { useSelector } from "react-redux";
 
-import Login from "./pages/Login";
-import Register from "./pages/Register";
+import Login from "./pages/loginReg/Login";
+import Register from "./pages/loginReg/Register";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import FarmerDashboard from "./pages/farmer/FarmerDashboard";
-import ForgotPassword from "./pages/ForgotPassword";
+import ForgotPassword from "./pages/loginReg/ForgotPassword";
 
 import "./App.css";
 import { FaShoppingCart } from "react-icons/fa";
+
+/* 🔒 Protected Route Component */
+function ProtectedRoute({ children, allowedRole }) {
+  const { isAuthenticated, role } = useSelector((state) => state.auth);
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (allowedRole && role !== allowedRole) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return children;
+}
 
 function Layout() {
   const location = useLocation();
@@ -61,8 +78,27 @@ function Layout() {
         <Route path="/login" element={<Login />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/admin" element={<AdminDashboard />} />
-        <Route path="/farmer" element={<FarmerDashboard />} />
+
+        {/* 🔒 Protected Admin Route */}
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute allowedRole="ADMIN">
+              <AdminDashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* 🔒 Protected Farmer Route */}
+        <Route
+          path="/farmer"
+          element={
+            <ProtectedRoute allowedRole="FARMER">
+              <FarmerDashboard />
+            </ProtectedRoute>
+          }
+        />
+
         <Route path="*" element={<Login />} />
       </Routes>
     </>
