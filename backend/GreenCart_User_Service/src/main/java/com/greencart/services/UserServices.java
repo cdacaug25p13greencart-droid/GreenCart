@@ -44,8 +44,8 @@ public class UserServices {
             return null;
         }
 
-        if (user.getStatus() != UserStatus.ACTIVE) {
-            throw new RuntimeException("User is not active");
+        if (user.getStatus().equals(UserStatus.PENDING.getCode())) {
+            return user; // return user, controller will decide
         }
 
         return user;
@@ -74,10 +74,11 @@ public class UserServices {
 	    user.setAnswer(request.getAnswer());
 
 	    user.setStatus(
-	        request.getRoleId() == 2
-	            ? UserStatus.PENDING
-	            : UserStatus.ACTIVE
-	    );
+	    	    request.getRoleId() == 2
+	    	        ? UserStatus.PENDING.getCode()   // 2
+	    	        : UserStatus.ACTIVE.getCode()    // 1
+	    	);
+
 
 	    SecurityQuestion question = questionRepo
 	        .findById(request.getQuestionId())

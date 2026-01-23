@@ -10,9 +10,8 @@ import lombok.Setter;
 @Getter
 @Setter
 public class LoginResponse {
-	
-	 private Integer userId;
-	    private String username;
-	    private Integer roleId;
 
+    private Integer userId;
+    private String username;
+    private String role;   // 👈 IMPORTANT
 }

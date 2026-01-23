@@ -70,16 +70,21 @@ public class User {
     @JsonIgnore   // optional, prevents infinite recursion in JSON
     private Area area;
 
-    
-    @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false)
-    private UserStatus status;
 
+    @Column(name = "status", nullable = false)
+    private Integer status;
+
+ // ✅ Helper method (ADD THIS)
+    public UserStatus getStatusEnum() {
+        return UserStatus.fromCode(this.status);
+    }
+
+    // optional setter if needed later
+    public void setStatusEnum(UserStatus status) {
+        this.status = status.getCode();
+    }
   
-//    // FK → security_questions table
-//    @Column(name = "question_id")
-//    private Integer questionId;
-    
+
     @ManyToOne
     @JoinColumn(name = "question_id")
     private SecurityQuestion question;

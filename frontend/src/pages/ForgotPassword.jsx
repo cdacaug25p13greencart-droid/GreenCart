@@ -26,7 +26,7 @@ export default function ForgotPassword() {
       setQuestion(res.data.question);
       setQuestionId(res.data.questionId);
     } catch (err) {
-      alert(err.response?.data || "User not found");
+      alert(err.response?.data || "User not found or account not active");
       setQuestion("");
       setQuestionId(null);
     }

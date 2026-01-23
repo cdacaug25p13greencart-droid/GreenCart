@@ -1,9 +1,5 @@
-
-
 import "./Register.css";
 import { useState, useEffect } from "react";
-// import { registerUser, getSecurityQuestions } from "../services/authService";
-// import { getCities, getAreasByCity } from "../services/authService";
 import {
   registerUser,
   getSecurityQuestions,
@@ -41,11 +37,6 @@ export default function Register() {
       .catch(() => alert("Failed to load security questions"));
   }, []);
 
-  // useEffect(() => {
-  //   getCities()
-  //     .then(res => setCities(res.data))
-  //     .catch(() => console.log("Failed to load cities"));
-  // }, []);
 
   useEffect(() => {
   getCities()
@@ -71,23 +62,6 @@ export default function Register() {
 
 
   const handleSubmit = (e) => {
-    /*e.preventDefault();
-
-    if (!username || !password || !roleId || !questionId || !answer) {
-      alert("Please fill all required fields!");
-      return;
-    }
-
-    if (roleId === "2" && !aadhaarNo) {
-      alert("Aadhaar number is required for Farmer");
-      return;
-    }
-    console.log("Register payload →", {
-      username,
-      roleId: Number(roleId),
-      questionId: Number(questionId),
-      answer
-    });*/
 
     e.preventDefault();
 
@@ -167,40 +141,6 @@ if (!areaId) {
 
   setErrors({});
 
-    //   registerUser({
-    //     username,
-    //     password,
-    //     firstName,
-    //     lastName,
-    //     roleId: Number(roleId),
-    //     aadhaarNo: roleId === "2" ? aadhaarNo : null,
-    //     email,
-    //     phone,
-    //     areaId: Number(areaId),          // ✅ REQUIRED
-    //     questionId: Number(questionId),
-    //     answer: answer.trim()
-    //   })
-    //   .then(() => {
-    //     alert("Registered successfully");
-    //     navigate("/login");
-    //   })
-    //  .catch(err => {
-    //   let msg = "Registration failed";
-
-    //   if (err.response?.data) {
-    //     if (typeof err.response.data === "string") {
-    //       msg = err.response.data;
-    //     } else if (err.response.data.message) {
-    //       msg = err.response.data.message;
-    //     } else if (err.response.data.error) {
-    //       msg = err.response.data.error;
-    //     }
-    //   }
-
-    //   setErrors({ api: msg });
-    // });
-
-
     registerUser({
         username,
         password,
@@ -214,19 +154,18 @@ if (!areaId) {
         questionId: Number(questionId),
         answer: answer.trim()
       })
-      .then(() => {
-        alert("Registered successfully");
-        navigate("/login");
-      })
-      .catch(err => {
-      const message =
-        typeof err.response?.data === "string"
-          ? err.response.data
-          : err.response?.data?.message || "Registration failed";
-
-      setErrors({ api: message });
-    });
-
+      .then(res => {
+    if (res.status === 200) {
+      alert("Registration successful");
+    }
+  })
+  .catch(err => {
+    if (err.response?.status === 409) {
+      alert("Username already exists");
+    } else {
+      alert("Registration failed");
+    }
+  });
 
 
 

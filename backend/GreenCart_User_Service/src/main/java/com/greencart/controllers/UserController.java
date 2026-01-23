@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 
 import com.greencart.entities.User;
+import com.greencart.enums.UserStatus;
 import com.greencart.services.UserServices;
 
 
@@ -32,28 +33,51 @@ public class UserController {
 		return uesrservices.getAll();
 	}
 	
-	 @PostMapping("/login")
-	    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
+	@PostMapping("/login")
+	public ResponseEntity<?> login(@RequestBody LoginRequest request) {
 
-	        User user = uesrservices.login(
-	                request.getUsername(),
-	                request.getPassword()
-	        );
+	    User user = uesrservices.login(
+	            request.getUsername(),
+	            request.getPassword()
+	    );
 
-	        if (user == null) {
-	            return ResponseEntity
-	                    .badRequest()
-	                    .body("Invalid username or password");
-	        }
-
-	        LoginResponse response = new LoginResponse(
-	                user.getUserId(),
-	                user.getUsername(),
-	                user.getRoleId()
-	        );
-
-	        return ResponseEntity.ok(response);
+	    if (user == null) {
+	        return ResponseEntity
+	                .badRequest()
+	                .body("Invalid username or password");
 	    }
+
+	    if (user.getStatus().equals(UserStatus.PENDING.getCode())) {
+	        return ResponseEntity
+	                .status(403)
+	                .body("ACCOUNT_NOT_VERIFIED");
+	    }
+
+	    
+	    String role;
+	    switch (user.getRoleId()) {
+	        case 1:
+	            role = "ADMIN";
+	            break;
+	        case 2:
+	            role = "FARMER";
+	            break;
+	        case 3:
+	            role = "BUYER";
+	            break;
+	        default:
+	            role = "UNKNOWN";
+	    }
+
+	    LoginResponse response = new LoginResponse(
+	            user.getUserId(),
+	            user.getUsername(),
+	            role
+	    );
+
+	    return ResponseEntity.ok(response);
+	}
+
 	
 	 @PostMapping("/register")
 	 public User registerUser(@RequestBody RegisterUserRequest request) {
