@@ -5,7 +5,7 @@ import {
   getSecurityQuestions,
   getCities,
   getAreasByCity
-} from "../services/authService";
+} from "../../services/authService";
 
 
 

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { login } from "../redux/authSlice";
+import { login } from "../../redux/authSlice";
 import "./Login.css";
 
 export default function Login() {
@@ -14,7 +14,7 @@ export default function Login() {
 
   // Redux state (FULL STATE FOR DEBUG)
   const authState = useSelector((state) => state.auth);
-  console.log("Redux Auth State:", authState);
+  // console.log("Redux Auth State:", authState);
 
   const { isAuthenticated, role, loading, error } = authState;
 

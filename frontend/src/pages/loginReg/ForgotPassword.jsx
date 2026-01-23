@@ -4,7 +4,7 @@ import {
   getUserSecurityQuestion,
   verifySecurityAnswer,
   resetPassword
-} from "../services/authService";
+} from "../../services/authService";
 import "./ForgotPassword.css";
 
 export default function ForgotPassword() {
