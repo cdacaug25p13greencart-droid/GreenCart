@@ -3,7 +3,6 @@ import {
   BrowserRouter as Router,
   Routes,
   Route,
-  NavLink,
   useLocation,
   Navigate
 } from "react-router-dom";
@@ -11,14 +10,19 @@ import { useSelector } from "react-redux";
 
 import Login from "./pages/loginReg/Login";
 import Register from "./pages/loginReg/Register";
-import AdminDashboard from "./pages/admin/AdminDashboard";
-import FarmerDashboard from "./pages/farmer/FarmerDashboard";
 import ForgotPassword from "./pages/loginReg/ForgotPassword";
 
-import "./App.css";
-import { FaShoppingCart } from "react-icons/fa";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import FarmerDashboard from "./pages/farmer/FarmerDashboard";
 
-/* 🔒 Protected Route Component */
+/* 🔹 Buyer Pages */
+import BuyerHome from "./pages/buyer/BuyerHome";
+import BrowseProducts from "./pages/buyer/BrowseProducts";
+import BuyerNavbar from "./components/BuyerNavbar";
+
+import "./App.css";
+
+/* 🔒 Protected Route */
 function ProtectedRoute({ children, allowedRole }) {
   const { isAuthenticated, role } = useSelector((state) => state.auth);
 
@@ -36,50 +40,27 @@ function ProtectedRoute({ children, allowedRole }) {
 function Layout() {
   const location = useLocation();
 
-  // Hide navbar on admin & farmer dashboards
+  /* ❌ Hide navbar on admin & farmer dashboards only */
   const hideNavbar =
     location.pathname.startsWith("/admin") ||
     location.pathname.startsWith("/farmer");
 
   return (
     <>
-      {!hideNavbar && (
-        <nav className="navbar">
-          {/* Left side */}
-          <div className="nav-left">
-            <FaShoppingCart className="cart-icon" />
-            <span className="brand-name">GreenCart</span>
-          </div>
-
-          {/* Right side */}
-          <div className="nav-right">
-            <NavLink
-              to="/login"
-              className={({ isActive }) =>
-                isActive ? "nav-link active" : "nav-link"
-              }
-            >
-              Login
-            </NavLink>
-
-            <NavLink
-              to="/register"
-              className={({ isActive }) =>
-                isActive ? "nav-link active" : "nav-link"
-              }
-            >
-              Register
-            </NavLink>
-          </div>
-        </nav>
-      )}
+      {/* Buyer Navbar */}
+      {!hideNavbar && <BuyerNavbar />}
 
       <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/register" element={<Register />} />
+        {/* -------- Buyer Routes -------- */}
+        <Route path="/" element={<BuyerHome />} />
+        <Route path="/products" element={<BrowseProducts />} />
 
-        {/* 🔒 Protected Admin Route */}
+        {/* -------- Auth Routes -------- */}
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+
+        {/* -------- Admin -------- */}
         <Route
           path="/admin"
           element={
@@ -89,7 +70,7 @@ function Layout() {
           }
         />
 
-        {/* 🔒 Protected Farmer Route */}
+        {/* -------- Farmer -------- */}
         <Route
           path="/farmer"
           element={
@@ -99,7 +80,8 @@ function Layout() {
           }
         />
 
-        <Route path="*" element={<Login />} />
+        {/* Fallback */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </>
   );
