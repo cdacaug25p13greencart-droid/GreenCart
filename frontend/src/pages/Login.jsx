@@ -1,87 +1,70 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { loginUser } from "../services/authService";
-import { useDispatch } from "react-redux";
-import { loginSuccess } from "../redux/authSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { login } from "../redux/authSlice";
 import "./Login.css";
 
 export default function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");   // ✅ added
-  const navigate = useNavigate();
+  const [localError, setLocalError] = useState("");
+
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
+  // Redux state (FULL STATE FOR DEBUG)
+  const authState = useSelector((state) => state.auth);
+  console.log("Redux Auth State:", authState);
 
+  const { isAuthenticated, role, loading, error } = authState;
 
   const handleLogin = (e) => {
-    // console.log("login");
-
     e.preventDefault();
-    setError(""); // clear previous error
+    setLocalError("");
 
+    // Frontend validation
     if (!username || !password) {
-      setError("Please enter username and password");
+      setLocalError("Please enter username and password");
       return;
     }
 
     if (username.length < 5 || username.length > 20) {
-      setError("Username must be between 5 and 20 characters");
+      setLocalError("Username must be between 5 and 20 characters");
       return;
     }
 
     if (password.length < 8 || password.length > 16) {
-      setError("Password must be between 8 and 16 characters");
+      setLocalError("Password must be between 8 and 16 characters");
       return;
     }
 
-   loginUser({ username, password })
-  .then(res => {
-    const role = res.data.role;
-
-    if (!role) {
-      setError("Role not received from server");
-      return;
-    }
-
-    dispatch(loginSuccess({
-      username: res.data.username,
-      role
-    }));
-
-    switch (role) {
-      case "ADMIN":
-        navigate("/admin");
-        break;
-      case "FARMER":
-        navigate("/farmer");
-        break;
-      case "BUYER":
-        navigate("/buyer/home");
-        break;
-      default:
-        navigate("/");
-    }
-  })
-  .catch(err => {
-    const message = err.response?.data;
-
-    if (message === "ACCOUNT_NOT_VERIFIED") {
-      alert("Your account is not yet verified by admin. Please wait for approval.");
-    } else {
-      setError(message || "Login failed");
-    }
-  });
-
-
+    // Dispatch Redux async action
+    dispatch(login({ username, password }));
   };
 
+  // Redirect after successful login
+  useEffect(() => {
+    if (isAuthenticated && role) {
+      switch (role) {
+        case "ADMIN":
+          navigate("/admin");
+          break;
+        case "FARMER":
+          navigate("/farmer");
+          break;
+        case "BUYER":
+          navigate("/buyer/home");
+          break;
+        default:
+          navigate("/");
+      }
+    }
+  }, [isAuthenticated, role, navigate]);
 
   return (
     <div className="login-container">
       <h2>Login</h2>
       <br />
-
 
       <form onSubmit={handleLogin}>
         <label>Username</label>
@@ -89,8 +72,7 @@ export default function Login() {
           type="text"
           placeholder="Username"
           value={username}
-          onChange={e => setUsername(e.target.value)}
-          required
+          onChange={(e) => setUsername(e.target.value)}
         />
 
         <label>Password</label>
@@ -98,16 +80,28 @@ export default function Login() {
           type="password"
           placeholder="Password"
           value={password}
-          onChange={e => setPassword(e.target.value)}
-          required
+          onChange={(e) => setPassword(e.target.value)}
         />
-        {error && (
+
+        {/* Local validation error */}
+        {localError && (
           <p style={{ color: "orange", marginBottom: "10px", fontSize: "14px" }}>
-            {error}
+            {localError}
           </p>
         )}
 
-        <button type="submit">Login</button>
+        {/* Backend / Redux error */}
+        {error && (
+          <p style={{ color: "red", marginBottom: "10px", fontSize: "14px" }}>
+            {error === "ACCOUNT_NOT_VERIFIED"
+              ? "Your account is not yet verified by admin. Please wait for approval."
+              : error}
+          </p>
+        )}
+
+        <button type="submit" disabled={loading}>
+          {loading ? "Logging in..." : "Login"}
+        </button>
 
         <Link to="/forgot-password" className="forgot-password-link">
           Forgot Password?
