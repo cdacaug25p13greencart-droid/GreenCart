@@ -1,16 +1,15 @@
 package com.greencart.dto;
 
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@NoArgsConstructor
+@Data
 @AllArgsConstructor
 @Getter
-@Setter
-public class LoginResponse {
-
+@Setter 
+public class UserDTO {
     private Integer userId;
     private String username;
     private String firstName;
@@ -19,6 +18,4 @@ public class LoginResponse {
     private String phone;
     private String role;
     private Integer status;
-    private String token; // JWT token
-    private Long expiresIn; // Token expiration time in milliseconds
 }

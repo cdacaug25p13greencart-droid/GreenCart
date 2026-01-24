@@ -5,19 +5,21 @@ import { login } from "../../redux/authSlice";
 import "./Login.css";
 
 export default function Login() {
+  // Local state
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [localError, setLocalError] = useState("");
 
+  // Hooks
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  // Redux state (FULL STATE FOR DEBUG)
-  const authState = useSelector((state) => state.auth);
-  // console.log("Redux Auth State:", authState);
+  // Redux state
+  const { isAuthenticated, role, loading, error } = useSelector(
+    (state) => state.auth
+  );
 
-  const { isAuthenticated, role, loading, error } = authState;
-
+  // Handle form submit
   const handleLogin = (e) => {
     e.preventDefault();
     setLocalError("");
@@ -38,7 +40,7 @@ export default function Login() {
       return;
     }
 
-    // Dispatch Redux async action
+    // ✅ Dispatch Redux async thunk
     dispatch(login({ username, password }));
   };
 
@@ -64,9 +66,9 @@ export default function Login() {
   return (
     <div className="login-container">
       <h2>Login</h2>
-      <br />
 
       <form onSubmit={handleLogin}>
+        {/* Username */}
         <label>Username</label>
         <input
           type="text"
@@ -75,6 +77,7 @@ export default function Login() {
           onChange={(e) => setUsername(e.target.value)}
         />
 
+        {/* Password */}
         <label>Password</label>
         <input
           type="password"
@@ -83,7 +86,7 @@ export default function Login() {
           onChange={(e) => setPassword(e.target.value)}
         />
 
-        {/* Local validation error */}
+        {/* Frontend validation error */}
         {localError && (
           <p style={{ color: "orange", marginBottom: "10px", fontSize: "14px" }}>
             {localError}
@@ -99,10 +102,12 @@ export default function Login() {
           </p>
         )}
 
+        {/* Submit */}
         <button type="submit" disabled={loading}>
           {loading ? "Logging in..." : "Login"}
         </button>
 
+        {/* Forgot password */}
         <Link to="/forgot-password" className="forgot-password-link">
           Forgot Password?
         </Link>

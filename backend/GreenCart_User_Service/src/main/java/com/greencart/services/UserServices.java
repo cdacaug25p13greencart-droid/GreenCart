@@ -34,22 +34,22 @@ public class UserServices {
 	
 	public User login(String username, String password) {
 
-        User user = userrepo.findByUsername(username);
+	    User user = userrepo.findByUsername(username);
 
-        if (user == null) {
-            return null;
-        }
+	    if (user == null) {
+	        throw new RuntimeException("INVALID_CREDENTIALS");
+	    }
 
-        if (!user.getPassword().equals(password)) {
-            return null;
-        }
+	    if (!user.getPassword().equals(password)) {
+	        throw new RuntimeException("INVALID_CREDENTIALS");
+	    }
 
-        if (user.getStatus().equals(UserStatus.PENDING.getCode())) {
-            return user; // return user, controller will decide
-        }
+	    if (user.getStatus().equals(UserStatus.PENDING.getCode())) {
+	        throw new RuntimeException("ACCOUNT_NOT_VERIFIED");
+	    }
 
-        return user;
-    }
+	    return user;
+	}
 
 	
 
