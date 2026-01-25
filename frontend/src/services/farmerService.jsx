@@ -1,108 +1,76 @@
-// src/services/farmerService.js
-import api from "../api/api";
-
-/*
-------------------------------------
- REAL BACKEND (enable later)
-------------------------------------
-
-// export const addProduct = (data) => api.post("/farmer/products", data);
-// export const getProducts = () => api.get("/farmer/products");
-// export const deleteProduct = (id) => api.delete(`/farmer/products/${id}`);
-
-// export const getCategories = () => api.get("/categories");
-// export const getSubcategories = (categoryId) =>
-//   api.get(`/categories/${categoryId}/subcategories`);
-
-------------------------------------
- DUMMY DATA FOR FRONTEND TESTING
-------------------------------------
-*/
-
-// -------- Categories --------
-let categories = [
-  { id: 1, name: "Vegetables" },
-  { id: 2, name: "Fruits" }
-];
-
-// -------- Subcategories --------
-let subcategories = [
-  { id: 101, name: "Leafy", categoryId: 1 },
-  { id: 102, name: "Root", categoryId: 1 },
-  { id: 201, name: "Citrus", categoryId: 2 },
-  { id: 202, name: "Tropical", categoryId: 2 }
-];
-
-// -------- Products --------
-let products = [
-  {
-    id: 1,
-    name: "Tomato",
-    price: 30,
-    quantity: 100,
-    categoryId: 1,
-    subcategoryId: 102
-  },
-  {
-    id: 2,
-    name: "Potato",
-    price: 20,
-    quantity: 200,
-    categoryId: 1,
-    subcategoryId: 102
-  }
-];
-
-// -------- Orders --------
-let orders = [
-  { id: 101, buyerName: "Amit", productName: "Tomato", status: "PENDING" },
-  { id: 102, buyerName: "Rohit", productName: "Potato", status: "PENDING" }
-];
+import farmerApi from "../api/farmerApi";
 
 /* -----------------------------
-   CATEGORY APIs (DUMMY)
+   CATEGORY APIs
 ------------------------------ */
 
 export const getCategories = () =>
-  Promise.resolve({ data: categories });
+  farmerApi.get("/categories").then(res => ({
+    data: res.data.map(cat => ({
+      id: cat.categoryId,
+      name: cat.categoryName
+    }))
+  }));
 
 export const getSubcategories = (categoryId) =>
-  Promise.resolve({
-    data: subcategories.filter(
-      sc => sc.categoryId === Number(categoryId)
-    )
-  });
+  farmerApi.get(`/subcategories/category/${categoryId}`).then(res => ({
+    data: res.data.map(sub => ({
+      id: sub.subCategoryId,
+      name: sub.subCategoryName
+    }))
+  }));
 
 /* -----------------------------
-   PRODUCT APIs (DUMMY)
+   PRODUCT APIs
 ------------------------------ */
 
 export const getProducts = () =>
-  Promise.resolve({ data: products });
+  farmerApi.get("/products/seller")
+    .then(res => ({ data: res.data }))
+    .catch(err => {
+      console.error("Error fetching products:", err);
+      // Return empty array if no products found (404) or unauthorized (401)
+      if (err.response?.status === 404 || err.response?.status === 401) {
+        return { data: [] };
+      }
+      throw err;
+    });
 
-export const addProduct = (product) => {
-  products.push({
-    id: Date.now(),
-    ...product
+export const addProduct = (productData) =>
+  farmerApi.post("/products/create", {
+    subCategoryId: productData.subCategoryId,
+    description: productData.description,
+    price: parseFloat(productData.price),
+    quantity: parseInt(productData.quantity),
+    imageUrl: productData.imageUrl
   });
-  return Promise.resolve();
-};
 
-export const deleteProduct = (id) => {
-  products = products.filter(p => p.id !== id);
-  return Promise.resolve();
-};
+export const updateProduct = (productId, productData) =>
+  farmerApi.put(`/products/update/${productId}`, {
+    subCategoryId: productData.subCategoryId,
+    description: productData.description,
+    price: parseFloat(productData.price),
+    quantity: parseInt(productData.quantity),
+    imageUrl: productData.imageUrl
+  });
+
+export const deleteProduct = (id) =>
+  farmerApi.delete(`/products/${id}`);
 
 /* -----------------------------
-   ORDER APIs (DUMMY)
+   ORDER APIs
 ------------------------------ */
 
 export const getOrders = () =>
-  Promise.resolve({ data: orders });
+  farmerApi.get("/farmer/orders")
+    .catch(err => {
+      console.error("Error fetching orders:", err);
+      // Return empty array if endpoint not implemented yet
+      if (err.response?.status === 404 || err.response?.status === 401) {
+        return { data: [] };
+      }
+      throw err;
+    });
 
-export const updateOrderStatus = (id, status) => {
-  orders = orders.map(o =>
-    o.id === id ? { ...o, status } : o
-  );
-  return Promise.resolve();
-};
+export const updateOrderStatus = (id, status) =>
+  farmerApi.patch(`/farmer/orders/${id}`, { status });

@@ -19,7 +19,7 @@ public class JwtUtil {
     // Secret key for signing JWT tokens (should be stored in environment variables
     // in production)
     private static final String SECRET_KEY = "YourSuperSecretKeyForJWTTokenGenerationMustBeLongEnoughForHS256Algorithm";
-    private static final long EXPIRATION_TIME = 60000; // 1 hour in milliseconds
+    private static final long EXPIRATION_TIME = 3600000; // 1 hour in milliseconds
 
     private Key getSigningKey() {
         return Keys.hmacShaKeyFor(SECRET_KEY.getBytes());

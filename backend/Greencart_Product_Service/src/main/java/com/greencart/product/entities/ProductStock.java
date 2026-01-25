@@ -7,32 +7,34 @@ import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-
 @Entity
 @Table(name = "products_stock")
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+@JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
 public class ProductStock {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "stock_id")
-    private int stockId;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "stock_id")
+	private int stockId;
 
-    @Column(name = "seller_id")
-    private int sellerId;
+	@Column(name = "seller_id")
+	private int sellerId;
 
-    @Column(name = "price")
-    private double price;
+	@Column(name = "price")
+	private double price;
 
-    @Column(name = "quantity")
-    private int quantity;
+	@Column(name = "quantity")
+	private int quantity;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "product_id")
-    private Product product;
-    
-    @Column(name = "created_at")
-    private LocalDateTime created_at;
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "product_id")
+	private Product product;
+
+	@Column(name = "created_at")
+	private LocalDateTime created_at;
+
+	@Column(name = "image_path", length = 500)
+	private String imagePath;
 
 	public int getStockId() {
 		return stockId;
@@ -82,10 +84,17 @@ public class ProductStock {
 		this.created_at = created_at;
 	}
 
+	public String getImagePath() {
+		return imagePath;
+	}
+
+	public void setImagePath(String imagePath) {
+		this.imagePath = imagePath;
+	}
+
 	public ProductStock() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
-    
-    
+
 }

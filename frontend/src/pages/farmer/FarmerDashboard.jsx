@@ -3,11 +3,13 @@ import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { logout } from "../../redux/authSlice";
 
-import FarmerProducts from "./FarmerProducts";
+import MyProducts from "./MyProducts";
+import AddProduct from "./AddProduct";
 import FarmerOrders from "./FarmerOrders";
 
 function FarmerDashboard() {
-  const [section, setSection] = useState("products");
+  const [section, setSection] = useState("my-products");
+  const [productToEdit, setProductToEdit] = useState(null);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -15,6 +17,16 @@ function FarmerDashboard() {
   const handleLogout = () => {
     dispatch(logout());
     navigate("/login", { replace: true });
+  };
+
+  const handleEditProduct = (product) => {
+    setProductToEdit(product);
+    setSection("add-product");
+  };
+
+  const handleBackToProducts = () => {
+    setProductToEdit(null);
+    setSection("my-products");
   };
 
   return (
@@ -31,17 +43,48 @@ function FarmerDashboard() {
         <h2>Farmer Panel</h2>
 
         <p
-          onClick={() => setSection("products")}
-          style={{ cursor: "pointer" }}
+          onClick={() => {
+            setProductToEdit(null);
+            setSection("my-products");
+          }}
+          style={{
+            cursor: "pointer",
+            padding: "10px",
+            background: section === "my-products" ? "#1b5e20" : "transparent",
+            borderRadius: "5px",
+            marginBottom: "5px"
+          }}
         >
-          My Products
+          📦 My Products
+        </p>
+
+        <p
+          onClick={() => {
+            setProductToEdit(null);
+            setSection("add-product");
+          }}
+          style={{
+            cursor: "pointer",
+            padding: "10px",
+            background: section === "add-product" ? "#1b5e20" : "transparent",
+            borderRadius: "5px",
+            marginBottom: "5px"
+          }}
+        >
+          ➕ Add Product
         </p>
 
         <p
           onClick={() => setSection("orders")}
-          style={{ cursor: "pointer" }}
+          style={{
+            cursor: "pointer",
+            padding: "10px",
+            background: section === "orders" ? "#1b5e20" : "transparent",
+            borderRadius: "5px",
+            marginBottom: "5px"
+          }}
         >
-          Buyer Orders
+          🧾 Buyer Orders
         </p>
 
         {/* Logout */}
@@ -50,17 +93,31 @@ function FarmerDashboard() {
           style={{
             cursor: "pointer",
             marginTop: "30px",
+            padding: "10px",
             color: "#ffcccb",
             fontWeight: "bold",
+            borderRadius: "5px",
+            background: "#c62828"
           }}
         >
-          Logout
+          🚪 Logout
         </p>
       </div>
 
       {/* Content */}
-      <div style={{ flex: 1, padding: "20px" }}>
-        {section === "products" && <FarmerProducts />}
+      <div style={{ flex: 1, padding: "20px", background: "#f5f5f5" }}>
+        {section === "my-products" && (
+          <MyProducts
+            onAddProductClick={() => setSection("add-product")}
+            onEditProduct={handleEditProduct}
+          />
+        )}
+        {section === "add-product" && (
+          <AddProduct
+            productToEdit={productToEdit}
+            onBackToProducts={handleBackToProducts}
+          />
+        )}
         {section === "orders" && <FarmerOrders />}
       </div>
     </div>
