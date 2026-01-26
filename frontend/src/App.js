@@ -152,6 +152,9 @@ import Register from "./pages/loginReg/Register";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import FarmerDashboard from "./pages/farmer/FarmerDashboard";
 import BuyerHome from "./pages/buyer/BuyerHome";
+import Cart from "./pages/buyer/Cart";
+import Orders from "./pages/buyer/Orders";
+import OrderDetails from "./pages/buyer/OrderDetails";
 import ForgotPassword from "./pages/loginReg/ForgotPassword";
 
 import "./App.css";
@@ -236,10 +239,37 @@ function Layout() {
         />
 
         <Route
-          path="/buyer"
+          path="/buyer/home"
           element={
             <ProtectedRoute allowedRole="BUYER">
               <BuyerHome />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/buyer/cart"
+          element={
+            <ProtectedRoute allowedRole="BUYER">
+              <Cart />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/buyer/orders"
+          element={
+            <ProtectedRoute allowedRole="BUYER">
+              <Orders />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/buyer/orders/:orderId"
+          element={
+            <ProtectedRoute allowedRole="BUYER">
+              <OrderDetails />
             </ProtectedRoute>
           }
         />

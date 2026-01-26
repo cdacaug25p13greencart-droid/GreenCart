@@ -1,27 +1,35 @@
- import { useState, useEffect } from "react";
-import { useDispatch } from "react-redux";
+import { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { logout } from "../../redux/authSlice";
-import { getAllAvailableProducts } from "../../api/buyerApi";
+import { setCart, addToCartSuccess, setLoading } from "../../redux/cartSlice";
+import { getAllAvailableProducts, addToCart as addToCartAPI, getCart } from "../../api/buyerApi";
 import "./BuyerHome.css";
 
 function BuyerHome() {
     const [products, setProducts] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoadingProducts] = useState(true);
     const [error, setError] = useState(null);
     const [searchTerm, setSearchTerm] = useState("");
     const [selectedCategory, setSelectedCategory] = useState("All");
+    const [quantities, setQuantities] = useState({});
+    const [notification, setNotification] = useState(null);
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const { user } = useSelector((state) => state.auth);
+    const { itemCount } = useSelector((state) => state.cart);
 
     useEffect(() => {
         fetchProducts();
+        if (user?.userId) {
+            fetchCart();
+        }
     }, []);
 
     const fetchProducts = async () => {
         try {
-            setLoading(true);
+            setLoadingProducts(true);
             const data = await getAllAvailableProducts();
             setProducts(data);
             setError(null);
@@ -29,13 +37,57 @@ function BuyerHome() {
             setError("Failed to load products. Please try again later.");
             console.error("Error fetching products:", err);
         } finally {
-            setLoading(false);
+            setLoadingProducts(false);
         }
+    };
+
+    const fetchCart = async () => {
+        try {
+            const cartData = await getCart(user.userId);
+            dispatch(setCart(cartData));
+        } catch (err) {
+            console.error("Error fetching cart:", err);
+        }
+    };
+
+    const handleAddToCart = async (stockId) => {
+        if (!user?.userId) {
+            showNotification("Please login to add items to cart", "error");
+            return;
+        }
+
+        const quantity = quantities[stockId] || 1;
+
+        try {
+            dispatch(setLoading(true));
+            const cartData = await addToCartAPI(user.userId, stockId, quantity);
+            dispatch(addToCartSuccess(cartData));
+            showNotification(`Added ${quantity} kg to cart!`, "success");
+            setQuantities({ ...quantities, [stockId]: 1 });
+        } catch (err) {
+            showNotification(err.response?.data?.error || "Failed to add to cart", "error");
+        }
+    };
+
+    const handleQuantityChange = (stockId, value) => {
+        const numValue = parseFloat(value);
+        if (numValue > 0) {
+            setQuantities({ ...quantities, [stockId]: numValue });
+        }
+    };
+
+    const showNotification = (message, type) => {
+        setNotification({ message, type });
+        setTimeout(() => setNotification(null), 3000);
     };
 
     const handleLogout = () => {
         dispatch(logout());
         navigate("/login", { replace: true });
+    };
+
+    const goToCart = () => {
+        navigate("/buyer/cart");
     };
 
     // Get unique categories
@@ -51,6 +103,13 @@ function BuyerHome() {
 
     return (
         <div className="buyer-home">
+            {/* Notification */}
+            {notification && (
+                <div className={`notification ${notification.type}`}>
+                    {notification.message}
+                </div>
+            )}
+
             {/* Header */}
             <header className="buyer-header">
                 <div className="header-content">
@@ -58,9 +117,15 @@ function BuyerHome() {
                         <span className="brand-icon">🌱</span>
                         <h1>GreenCart</h1>
                     </div>
-                    <button onClick={handleLogout} className="logout-btn">
-                        🚪 Logout
-                    </button>
+                    <div className="header-actions">
+                        <button onClick={goToCart} className="cart-btn">
+                            🛒 Cart
+                            {itemCount > 0 && <span className="cart-badge">{itemCount}</span>}
+                        </button>
+                        <button onClick={handleLogout} className="logout-btn">
+                            🚪 Logout
+                        </button>
+                    </div>
                 </div>
             </header>
 
@@ -158,9 +223,24 @@ function BuyerHome() {
                                         </div>
                                     </div>
 
-                                    <button className="add-to-cart-btn">
-                                        🛒 Add to Cart
-                                    </button>
+                                    <div className="cart-controls">
+                                        <div className="quantity-selector">
+                                            <label>Qty (kg):</label>
+                                            <input
+                                                type="number"
+                                                min="0.5"
+                                                step="0.5"
+                                                value={quantities[product.stockId] || 1}
+                                                onChange={(e) => handleQuantityChange(product.stockId, e.target.value)}
+                                            />
+                                        </div>
+                                        <button
+                                            className="add-to-cart-btn"
+                                            onClick={() => handleAddToCart(product.stockId)}
+                                        >
+                                            🛒 Add to Cart
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         ))}
@@ -177,3 +257,4 @@ function BuyerHome() {
 }
 
 export default BuyerHome;
+
