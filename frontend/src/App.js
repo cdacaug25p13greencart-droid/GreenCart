@@ -151,6 +151,7 @@ import Login from "./pages/loginReg/Login";
 import Register from "./pages/loginReg/Register";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import FarmerDashboard from "./pages/farmer/FarmerDashboard";
+import BuyerHome from "./pages/buyer/BuyerHome";
 import ForgotPassword from "./pages/loginReg/ForgotPassword";
 
 import "./App.css";
@@ -174,10 +175,11 @@ function ProtectedRoute({ children, allowedRole }) {
 function Layout() {
   const location = useLocation();
 
-  // Hide navbar on admin & farmer dashboards
+  // Hide navbar on admin, farmer, and buyer pages
   const hideNavbar =
     location.pathname.startsWith("/admin") ||
-    location.pathname.startsWith("/farmer");
+    location.pathname.startsWith("/farmer") ||
+    location.pathname.startsWith("/buyer");
 
   return (
     <>
@@ -229,6 +231,15 @@ function Layout() {
           element={
             <ProtectedRoute allowedRole="FARMER">
               <FarmerDashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/buyer"
+          element={
+            <ProtectedRoute allowedRole="BUYER">
+              <BuyerHome />
             </ProtectedRoute>
           }
         />

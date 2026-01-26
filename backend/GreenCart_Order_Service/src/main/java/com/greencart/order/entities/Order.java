@@ -13,40 +13,37 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import lombok.Getter;
-import lombok.Setter;
 
 @Entity
 @Table(name = "orders")
 public class Order {
-	
-	    @Id
-	    @GeneratedValue(strategy = GenerationType.IDENTITY)
-	    @Column(name = "order_id")
-	    private Integer orderId;
 
-	    // buyer_id → users(user_id)
-	    @ManyToOne
-	    @JoinColumn(name = "buyer_id", nullable = false)
-	    private User buyer;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "order_id")
+	private Integer orderId;
 
-	    @Column(name = "order_date")
-	    private LocalDateTime orderDate;
+	// buyer_id → users(user_id)
+	@ManyToOne
+	@JoinColumn(name = "buyer_id", nullable = false)
+	private User buyer;
 
-	    @Column(name = "total_amount")
-	    private Double totalAmount;
+	@Column(name = "order_date")
+	private LocalDateTime orderDate;
 
-	    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
-	    private List<OrderItem> orderItems;
+	@Column(name = "total_amount")
+	private Double totalAmount;
 
-	    public Order() {
-	        this.orderDate = LocalDateTime.now();
-	    }
+	@OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+	private List<OrderItem> orderItems;
 
-	    // getters and setters
+	public Order() {
+		this.orderDate = LocalDateTime.now();
+	}
 
+	// getters and setters
 
-	 public Integer getOrderId() {
+	public Integer getOrderId() {
 		return orderId;
 	}
 
@@ -85,7 +82,5 @@ public class Order {
 	public void setOrderItems(List<OrderItem> orderItems) {
 		this.orderItems = orderItems;
 	}
-
-	
 
 }

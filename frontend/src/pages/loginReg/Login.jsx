@@ -55,7 +55,7 @@ export default function Login() {
           navigate("/farmer");
           break;
         case "BUYER":
-          navigate("/buyer/home");
+          navigate("/buyer");
           break;
         default:
           navigate("/");
