@@ -28,4 +28,31 @@ farmerApi.interceptors.request.use(
   }
 );
 
+// Separate API instance for farmer orders (uses Buyer Service on port 8082)
+export const farmerOrderApi = axios.create({
+  baseURL: "http://localhost:8082"
+});
+
+// Add same interceptors to farmerOrderApi
+farmerOrderApi.interceptors.request.use(
+  (config) => {
+    const state = store.getState();
+    const token = state.auth.token;
+    const user = state.auth.user;
+
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+
+    if (user && user.userId) {
+      config.headers['X-User-Id'] = user.userId;
+    }
+
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
 export default farmerApi;

@@ -165,7 +165,11 @@ export default function Register() {
   return (
     <div className="register-container">
       <div className="register-form-wrapper">
-        <h2>Create Account</h2>
+        <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
+          <span style={{ fontSize: '3rem', display: 'block', marginBottom: '0.5rem' }}>🌳</span>
+          <h2>Join GreenCart</h2>
+          <p style={{ color: '#666', fontSize: '1rem' }}>Create your account to start your green journey</p>
+        </div>
 
         <form onSubmit={handleSubmit}>
           {/* Row 1: Username, Password, First Name */}

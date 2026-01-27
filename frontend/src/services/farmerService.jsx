@@ -1,4 +1,4 @@
-import farmerApi from "../api/farmerApi";
+import farmerApi, { farmerOrderApi } from "../api/farmerApi";
 
 /* -----------------------------
    CATEGORY APIs
@@ -61,10 +61,11 @@ export const deleteProduct = (id) =>
    ORDER APIs
 ------------------------------ */
 
-export const getOrders = () =>
-  farmerApi.get("/farmer/orders")
+export const getFarmerOrders = (sellerId) =>
+  farmerOrderApi.get(`/api/farmer/orders/seller/${sellerId}`)
+    .then(res => ({ data: res.data }))
     .catch(err => {
-      console.error("Error fetching orders:", err);
+      console.error("Error fetching farmer orders:", err);
       // Return empty array if endpoint not implemented yet
       if (err.response?.status === 404 || err.response?.status === 401) {
         return { data: [] };
@@ -72,5 +73,7 @@ export const getOrders = () =>
       throw err;
     });
 
-export const updateOrderStatus = (id, status) =>
-  farmerApi.patch(`/farmer/orders/${id}`, { status });
+export const updatePaymentStatus = (paymentId, status) =>
+  farmerOrderApi.patch(`/api/farmer/orders/payment/${paymentId}/status`, {
+    paymentStatus: status
+  });

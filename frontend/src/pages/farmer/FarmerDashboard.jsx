@@ -6,6 +6,7 @@ import { logout } from "../../redux/authSlice";
 import MyProducts from "./MyProducts";
 import AddProduct from "./AddProduct";
 import FarmerOrders from "./FarmerOrders";
+import "../SharedSidebar.css";
 
 function FarmerDashboard() {
   const [section, setSection] = useState("my-products");
@@ -30,95 +31,75 @@ function FarmerDashboard() {
   };
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh" }}>
+    <div className="admin-dashboard-container"> {/* Reusing the flex container structure */}
       {/* Sidebar */}
-      <div
-        style={{
-          width: "220px",
-          background: "#2e7d32",
-          color: "#fff",
-          padding: "20px",
-        }}
-      >
-        <h2>Farmer Panel</h2>
+      <div className="sidebar-container">
+        <div className="sidebar-header">
+          <h2>
+            <span>👨‍🌾</span> <span>Farmer Panel</span>
+          </h2>
+        </div>
 
-        <p
-          onClick={() => {
-            setProductToEdit(null);
-            setSection("my-products");
-          }}
-          style={{
-            cursor: "pointer",
-            padding: "10px",
-            background: section === "my-products" ? "#1b5e20" : "transparent",
-            borderRadius: "5px",
-            marginBottom: "5px"
-          }}
-        >
-          📦 My Products
-        </p>
+        <div className="sidebar-nav">
+          <div
+            className={`nav-item ${section === "my-products" ? "active" : ""}`}
+            onClick={() => {
+              setProductToEdit(null);
+              setSection("my-products");
+            }}
+          >
+            <span>📦</span> <span>My Products</span>
+          </div>
 
-        <p
-          onClick={() => {
-            setProductToEdit(null);
-            setSection("add-product");
-          }}
-          style={{
-            cursor: "pointer",
-            padding: "10px",
-            background: section === "add-product" ? "#1b5e20" : "transparent",
-            borderRadius: "5px",
-            marginBottom: "5px"
-          }}
-        >
-          ➕ Add Product
-        </p>
+          <div
+            className={`nav-item ${section === "add-product" ? "active" : ""}`}
+            onClick={() => {
+              setProductToEdit(null);
+              setSection("add-product");
+            }}
+          >
+            <span>➕</span> <span>Add Product</span>
+          </div>
 
-        <p
-          onClick={() => setSection("orders")}
-          style={{
-            cursor: "pointer",
-            padding: "10px",
-            background: section === "orders" ? "#1b5e20" : "transparent",
-            borderRadius: "5px",
-            marginBottom: "5px"
-          }}
-        >
-          🧾 Buyer Orders
-        </p>
+          <div
+            className={`nav-item ${section === "orders" ? "active" : ""}`}
+            onClick={() => setSection("orders")}
+          >
+            <span>🧾</span> <span>Buyer Orders</span>
+          </div>
+        </div>
 
-        {/* Logout */}
-        <p
-          onClick={handleLogout}
-          style={{
-            cursor: "pointer",
-            marginTop: "30px",
-            padding: "10px",
-            color: "#ffcccb",
-            fontWeight: "bold",
-            borderRadius: "5px",
-            background: "#c62828"
-          }}
-        >
-          🚪 Logout
-        </p>
+        <div className="sidebar-footer">
+          <div className="nav-item logout-item" onClick={handleLogout}>
+            <span>🚪</span> <span>Logout</span>
+          </div>
+        </div>
       </div>
 
-      {/* Content */}
-      <div style={{ flex: 1, padding: "20px", background: "#f5f5f5" }}>
-        {section === "my-products" && (
-          <MyProducts
-            onAddProductClick={() => setSection("add-product")}
-            onEditProduct={handleEditProduct}
-          />
-        )}
-        {section === "add-product" && (
-          <AddProduct
-            productToEdit={productToEdit}
-            onBackToProducts={handleBackToProducts}
-          />
-        )}
-        {section === "orders" && <FarmerOrders />}
+      {/* Main Content */}
+      <div className="admin-main-content"> {/* Reusing content area styling */}
+        <header className="admin-header">
+          <h3>Farmer Operations Center</h3>
+          <div className="user-profile">
+            <span>Welcome, Farmer</span>
+          </div>
+        </header>
+
+        <main className="admin-content-body">
+          {section === "my-products" && (
+            <MyProducts
+              onAddProductClick={() => setSection("add-product")}
+              onEditProduct={handleEditProduct}
+            />
+          )}
+          {section === "add-product" && (
+            <AddProduct
+              productToEdit={productToEdit}
+              onBackToProducts={handleBackToProducts}
+            />
+          )}
+          {section === "orders" && <FarmerOrders />}
+        </main>
       </div>
     </div>
   );

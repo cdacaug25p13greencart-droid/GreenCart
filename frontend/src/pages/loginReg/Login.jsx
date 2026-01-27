@@ -65,52 +65,69 @@ export default function Login() {
 
   return (
     <div className="login-container">
-      <h2>Login</h2>
+      <form onSubmit={handleLogin} className="login-form">
+        <div className="login-header">
+          <span className="login-logo">🥗</span>
+          <h2>Welcome Back</h2>
+          <p className="subtitle">Sign in to your GreenCart account</p>
+        </div>
 
-      <form onSubmit={handleLogin}>
         {/* Username */}
-        <label>Username</label>
-        <input
-          type="text"
-          placeholder="Username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-        />
+        <div className="input-group">
+          <label htmlFor="username">Username</label>
+          <input
+            id="username"
+            type="text"
+            placeholder="Enter your username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            autoComplete="username"
+          />
+        </div>
 
         {/* Password */}
-        <label>Password</label>
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
+        <div className="input-group">
+          <label htmlFor="password">Password</label>
+          <input
+            id="password"
+            type="password"
+            placeholder="••••••••"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            autoComplete="current-password"
+          />
+        </div>
 
         {/* Frontend validation error */}
         {localError && (
-          <p style={{ color: "orange", marginBottom: "10px", fontSize: "14px" }}>
-            {localError}
-          </p>
+          <div className="error-message local">
+            <span>⚠️</span> {localError}
+          </div>
         )}
 
         {/* Backend / Redux error */}
         {error && (
-          <p style={{ color: "red", marginBottom: "10px", fontSize: "14px" }}>
+          <div className="error-message server">
+            <span>🚫</span>
             {error === "ACCOUNT_NOT_VERIFIED"
               ? "Your account is not yet verified by admin. Please wait for approval."
               : error}
-          </p>
+          </div>
         )}
 
         {/* Submit */}
         <button type="submit" disabled={loading}>
-          {loading ? "Logging in..." : "Login"}
+          {loading ? "Verifying..." : "Sign In"}
         </button>
 
         {/* Forgot password */}
         <Link to="/forgot-password" className="forgot-password-link">
           Forgot Password?
         </Link>
+
+        <div style={{ textAlign: 'center', marginTop: '1.5rem', fontSize: '0.9rem', color: '#666' }}>
+          Don't have an account? <Link to="/register" style={{ color: '#2e7d32', fontWeight: 700, textDecoration: 'none' }}>Sign Up</Link>
+        </div>
       </form>
     </div>
   );

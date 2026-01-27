@@ -163,23 +163,31 @@ public class OrderService {
     private OrderItemDTO convertOrderItemToDTO(OrderItem item) {
         OrderItemDTO dto = new OrderItemDTO();
         dto.setOrderItemId(item.getOrderItemId());
-        dto.setProductId(item.getProduct().getPid());
-        dto.setProductName(item.getProductName());
-        dto.setUnitPrice(item.getUnitPrice());
-        dto.setQuantity(item.getQuantity());
-        dto.setTotalPrice(item.getTotalPrice());
 
-        // Get product stock for image
-        List<ProductStock> stocks = productStockRepository.findByProduct_Pid(item.getProduct().getPid());
-        if (!stocks.isEmpty()) {
-            dto.setImagePath(stocks.get(0).getImagePath());
-        }
+        if (item.getProduct() != null) {
+            dto.setProductId(item.getProduct().getPid());
+            dto.setProductName(item.getProductName());
+            dto.setUnitPrice(item.getUnitPrice());
+            dto.setQuantity(item.getQuantity());
+            dto.setTotalPrice(item.getTotalPrice());
 
-        if (item.getProduct().getSubCategory() != null) {
-            dto.setSubCategoryName(item.getProduct().getSubCategory().getSubCategoryName());
-            if (item.getProduct().getSubCategory().getCategory() != null) {
-                dto.setCategoryName(item.getProduct().getSubCategory().getCategory().getCategoryName());
+            // Get product stock for image
+            List<ProductStock> stocks = productStockRepository.findByProduct_Pid(item.getProduct().getPid());
+            if (!stocks.isEmpty()) {
+                dto.setImagePath(stocks.get(0).getImagePath());
             }
+
+            if (item.getProduct().getSubCategory() != null) {
+                dto.setSubCategoryName(item.getProduct().getSubCategory().getSubCategoryName());
+                if (item.getProduct().getSubCategory().getCategory() != null) {
+                    dto.setCategoryName(item.getProduct().getSubCategory().getCategory().getCategoryName());
+                }
+            }
+        } else {
+            dto.setProductName(item.getProductName());
+            dto.setUnitPrice(item.getUnitPrice());
+            dto.setQuantity(item.getQuantity());
+            dto.setTotalPrice(item.getTotalPrice());
         }
 
         return dto;
@@ -194,5 +202,34 @@ public class OrderService {
         dto.setPayableAmount(payment.getPayableAmount());
         dto.setPaymentStatus(payment.getPaymentStatus());
         return dto;
+    }
+
+    /**
+     * Get all orders containing products sold by a specific seller/farmer
+     */
+    @Transactional(readOnly = true)
+    public List<OrderDTO> getOrdersBySeller(Integer sellerId) {
+        List<Order> orders = orderRepository.findOrdersBySellerId(sellerId);
+        return orders.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Update payment status (for farmers to mark as paid after receiving money)
+     */
+    @Transactional
+    public PaymentDTO updatePaymentStatus(Integer paymentId, PaymentStatus newStatus) {
+        Payment payment = paymentRepository.findById(paymentId)
+                .orElseThrow(() -> new RuntimeException("Payment not found"));
+
+        // Only allow PENDING -> SUCCESS transition
+        if (payment.getPaymentStatus() == PaymentStatus.PENDING && newStatus == PaymentStatus.SUCCESS) {
+            payment.setPaymentStatus(newStatus);
+            payment = paymentRepository.save(payment);
+            return convertPaymentToDTO(payment);
+        } else {
+            throw new RuntimeException("Invalid payment status transition");
+        }
     }
 }

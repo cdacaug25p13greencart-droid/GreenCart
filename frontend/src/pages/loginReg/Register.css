@@ -1,217 +1,179 @@
-/* Register.css - Table-like Grid Layout */
-form {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr); /* ALWAYS 3 per row */
-  gap: 28px;
-}
-
-
 .register-container {
-  min-height: 100vh;
-  background-color: #f4f6f8;
-  padding: 40px 20px;
   display: flex;
   justify-content: center;
   align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #1b5e20 0%, #2e7d32 100%);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  padding: 40px 20px;
 }
 
 .register-form-wrapper {
-  background: white;
-  padding: 50px 70px;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(15px);
+  padding: 3rem 4rem;
+  border-radius: 24px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
   width: 100%;
-  max-width: 90%;
-  margin: 0 auto;
+  max-width: 1100px;
+  position: relative;
+  overflow: hidden;
+}
+
+.register-form-wrapper::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 6px;
+  background: linear-gradient(90deg, #4caf50, #81c784);
 }
 
 .register-form-wrapper h2 {
   text-align: center;
-  margin-bottom: 40px;
-  color: #333;
-  font-size: 32px;
-  font-weight: 600;
+  margin-bottom: 3rem;
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: #1b5e20;
+  letter-spacing: -1px;
 }
 
-/* Strict Table Grid - 3 columns, equal width */
-.form-row {
+form {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 30px;
-  margin-bottom: 20px;
+  gap: 24px;
 }
 
-/* All fields have identical dimensions */
-.form-field {
+.form-group {
   display: flex;
   flex-direction: column;
+  gap: 8px;
+  min-height: 95px;
 }
 
-.form-field label {
-  margin-bottom: 8px;
-  font-weight: 500;
-  color: #555;
-  font-size: 15px;
-  height: 22px;
+.form-group label {
+  font-weight: 600;
+  color: #333;
+  font-size: 0.9rem;
   display: flex;
   align-items: center;
 }
 
 .optional-label {
-  font-size: 12px;
-  color: #999;
+  font-size: 11px;
+  color: #888;
   font-weight: 400;
-  margin-left: 5px;
+  margin-left: 6px;
+  font-style: italic;
 }
 
-.form-field input,
-.form-field select {
+.form-group input,
+.form-group select {
   width: 100%;
-  height: 44px;
-  padding: 10px 14px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 15px;
-  transition: all 0.3s;
-  background-color: white;
+  padding: 12px 16px;
+  border: 2px solid #eef2f3;
+  border-radius: 12px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  outline: none;
+  background: #fdfdfd;
   box-sizing: border-box;
 }
 
-.form-field input:focus,
-.form-field select:focus {
+.form-group input:focus,
+.form-group select:focus {
   border-color: #2e7d32;
-  outline: none;
-  box-shadow: 0 0 0 2px rgba(46, 125, 50, 0.1);
+  background: #ffffff;
+  box-shadow: 0 0 0 4px rgba(46, 125, 50, 0.1);
 }
 
-.form-field input::placeholder {
-  color: #aaa;
-}
-
-.form-field input:disabled,
-.form-field select:disabled {
+.form-group input:disabled,
+.form-group select:disabled {
   background-color: #f5f5f5;
   cursor: not-allowed;
   color: #999;
 }
 
-/* Error Text */
 .error-text {
-  color: #d32f2f;
+  color: #c62828;
   font-size: 12px;
-  margin-top: 5px;
-  min-height: 16px;
+  margin-top: 4px;
+  font-weight: 500;
 }
 
-/* Button Group - Centered and properly spaced */
 .button-group {
+  grid-column: span 3;
   display: flex;
   justify-content: center;
-  align-items: center;
   gap: 20px;
-  margin-top: 40px;
-  padding-top: 30px;
-  border-top: 1px solid #e0e0e0;
+  margin-top: 3rem;
+  padding-top: 2.5rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .button-group button {
-  padding: 14px 50px;
+  padding: 14px 45px;
   border: none;
-  border-radius: 4px;
+  border-radius: 12px;
   cursor: pointer;
-  font-size: 16px;
-  font-weight: 500;
-  transition: all 0.3s;
-  min-width: 160px;
-  height: 48px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  min-width: 180px;
 }
 
 .register-btn {
-  background-color: #2e7d32;
+  background: linear-gradient(90deg, #2e7d32, #1b5e20);
   color: white;
+  box-shadow: 0 10px 20px rgba(27, 94, 32, 0.2);
 }
 
 .register-btn:hover {
-  background-color: #1b5e20;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(46, 125, 50, 0.3);
+  box-shadow: 0 15px 25px rgba(27, 94, 32, 0.3);
 }
 
 .cancel-btn {
-  background-color: #f5f5f5;
+  background: #f5f5f5;
   color: #555;
   border: 1px solid #ddd;
 }
 
 .cancel-btn:hover {
-  background-color: #e0e0e0;
-  border-color: #bbb;
+  background: #eeeeee;
   transform: translateY(-2px);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-.form-group {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  height: 80px; /* critical */
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
 }
 
-/* INPUT / SELECT */
-.form-group input,
-.form-group select {
-  height: 60px;                  
-  padding: 14px 16px;
-  font-size: 16px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  box-sizing: border-box;
-}
-
-
-.error-text {
-  min-height: 16px;
-  font-size: 12px;
-  color: #d32f2f;
-}
-
-
-/* Responsive Design */
-@media (max-width: 1200px) {
+@media (max-width: 1100px) {
   .register-form-wrapper {
-    padding: 40px 50px;
-  }
-
-  .form-row {
-    gap: 25px;
+    max-width: 95%;
+    padding: 3rem;
   }
 }
 
 @media (max-width: 992px) {
-  .form-row {
+  form {
     grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
-  }
-
-  .register-form-wrapper {
-    padding: 35px 40px;
-  }
-}
-
-@media (max-width: 576px) {
-  .form-row {
-    grid-template-columns: 1fr;
-  }
-
-  .register-form-wrapper {
-    padding: 30px 20px;
   }
 
   .button-group {
-    flex-direction: column;
-    gap: 15px;
+    grid-column: span 2;
+  }
+}
+
+@media (max-width: 600px) {
+  form {
+    grid-template-columns: 1fr;
   }
 
-  .button-group button {
-    width: 100%;
+  .button-group {
+    grid-column: span 1;
+    flex-direction: column-reverse;
+  }
+
+  .register-form-wrapper {
+    padding: 2.5rem 1.5rem;
   }
 }

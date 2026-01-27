@@ -15,18 +15,21 @@ export default function ForgotPassword() {
   const [answer, setAnswer] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   // Fetch security question for the given email
   const fetchUserQuestion = async () => {
     if (!email) return;
+    setError("");
 
     try {
       const res = await getUserSecurityQuestion(email);
       setQuestion(res.data.question);
       setQuestionId(res.data.questionId);
     } catch (err) {
-      alert(err.response?.data || "User not found or account not active");
+      setError(err.response?.data || "User not found or account not active");
       setQuestion("");
       setQuestionId(null);
     }
@@ -35,111 +38,158 @@ export default function ForgotPassword() {
   // Verify answer
   const handleVerify = async (e) => {
     e.preventDefault();
+    setError("");
 
     if (!email || !questionId || !answer) {
-      alert("Please fill in all fields");
+      setError("Please fill in all fields");
       return;
     }
 
+    setIsLoading(true);
     try {
       await verifySecurityAnswer({
         email,
         questionId,
         answer
       });
-
-      alert("Answer verified! Please set your new password.");
       setStep(2);
     } catch (err) {
-      alert(err.response?.data || "Verification failed");
+      setError(err.response?.data || "Verification failed");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   // Reset password
   const handleReset = async (e) => {
     e.preventDefault();
+    setError("");
 
-    if (newPassword !== confirmPassword) {
-      alert("Passwords do not match!");
+    // Password validation: 8 to 16 characters
+    if (newPassword.length < 8 || newPassword.length > 16) {
+      setError("Password must be between 8 and 16 characters");
       return;
     }
 
+    if (newPassword !== confirmPassword) {
+      setError("Passwords do not match!");
+      return;
+    }
+
+    setIsLoading(true);
     try {
       await resetPassword({
         email,
         newPassword
       });
-
-      alert("Password reset successfully! Please login.");
+      alert("Password reset successfully! Redirecting to login...");
       navigate("/login");
     } catch (err) {
-      alert(err.response?.data || "Reset failed");
+      setError(err.response?.data || "Reset failed");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
     <div className="forgot-password-container">
-      <div className="forgot-password-box">
-        <h2>{step === 1 ? "Forgot Password" : "Reset Password"}</h2>
+      <form onSubmit={step === 1 ? handleVerify : handleReset} className="forgot-password-form">
+        <div className="form-header">
+          <span className="form-icon">{step === 1 ? "�" : "🔒"}</span>
+          <h2>{step === 1 ? "Forgot Password" : "Reset Password"}</h2>
+          <p className="subtitle">
+            {step === 1
+              ? "Verify your identity to continue"
+              : "Create a new strong password"}
+          </p>
+        </div>
 
-        {step === 1 ? (
-          <form onSubmit={handleVerify}>
-            <label>Email</label>
-            <input
-              type="email"
-              placeholder="Enter your email"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-              onBlur={fetchUserQuestion}
-              required
-            />
-
-            <label>Security Question</label>
-            <input
-              type="text"
-              value={question}
-              readOnly
-            />
-
-            <label>Answer</label>
-            <input
-              type="text"
-              placeholder="Enter your answer"
-              value={answer}
-              onChange={e => setAnswer(e.target.value)}
-              required
-            />
-
-            <button type="submit">Verify</button>
-          </form>
-        ) : (
-          <form onSubmit={handleReset}>
-            <label>New Password</label>
-            <input
-              type="password"
-              placeholder="Enter new password"
-              value={newPassword}
-              onChange={e => setNewPassword(e.target.value)}
-              required
-            />
-
-            <label>Confirm Password</label>
-            <input
-              type="password"
-              placeholder="Confirm new password"
-              value={confirmPassword}
-              onChange={e => setConfirmPassword(e.target.value)}
-              required
-            />
-
-            <button type="submit">Reset Password</button>
-          </form>
+        {error && (
+          <div className="error-message">
+            <span>⚠️</span> {error}
+          </div>
         )}
 
-        <Link to="/login" className="back-link">
-          Back to Login
-        </Link>
-      </div>
+        {step === 1 ? (
+          <div className="form-fields">
+            <div className="input-field">
+              <label htmlFor="email">Email</label>
+              <input
+                id="email"
+                type="email"
+                placeholder="Enter your email"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                onBlur={fetchUserQuestion}
+                required
+              />
+            </div>
+
+            <div className="input-field">
+              <label htmlFor="question">Security Question</label>
+              <input
+                id="question"
+                type="text"
+                value={question || "Enter email to see question"}
+                readOnly
+              />
+            </div>
+
+            <div className="input-field">
+              <label htmlFor="answer">Answer</label>
+              <input
+                id="answer"
+                type="text"
+                placeholder="Enter your answer"
+                value={answer}
+                onChange={e => setAnswer(e.target.value)}
+                required
+              />
+              <span className="helper-text">Answers are case sensitive</span>
+            </div>
+
+            <button type="submit" className="action-button" disabled={isLoading}>
+              {isLoading ? "Verifying..." : "Verify Identity"}
+            </button>
+          </div>
+        ) : (
+          <div className="form-fields">
+            <div className="input-field">
+              <label htmlFor="newPassword">New Password</label>
+              <input
+                id="newPassword"
+                type="password"
+                placeholder="8-16 characters"
+                value={newPassword}
+                onChange={e => setNewPassword(e.target.value)}
+                required
+              />
+            </div>
+
+            <div className="input-field">
+              <label htmlFor="confirmPassword">Confirm Password</label>
+              <input
+                id="confirmPassword"
+                type="password"
+                placeholder="Confirm your password"
+                value={confirmPassword}
+                onChange={e => setConfirmPassword(e.target.value)}
+                required
+              />
+            </div>
+
+            <button type="submit" className="action-button" disabled={isLoading}>
+              {isLoading ? "Resetting..." : "Reset Password"}
+            </button>
+          </div>
+        )}
+
+        <div className="form-footer">
+          <Link to="/login" className="back-link">
+            Back to Login
+          </Link>
+        </div>
+      </form>
     </div>
   );
 }
