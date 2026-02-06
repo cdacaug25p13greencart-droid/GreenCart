@@ -13,5 +13,12 @@ public class LoginResponse {
 
     private Integer userId;
     private String username;
-    private String role;   // 👈 IMPORTANT
+    private String firstName;
+    private String lastName;
+    private String email;
+    private String phone;
+    private String role;
+    private Integer status;
+    private String token; // JWT token
+    private Long expiresIn; // Token expiration time in milliseconds
 }

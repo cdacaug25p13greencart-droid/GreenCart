@@ -32,3 +32,31 @@ build/
 ### VS Code ###
 .vscode/
 /.metadata/
+
+hs_err_pid*.log
+
+# ===== IDE =====
+.metadata/
+.vs/
+.idea/
+*.suo
+*.user
+*.cache
+
+# ===== Java / Maven =====
+target/
+
+# ===== Node =====
+node_modules/
+
+# ===== .NET =====
+bin/
+obj/
+
+# ===== Logs =====
+*.log
+hs_err_pid*.log
+build_output.txt
+errors.txt
+
+

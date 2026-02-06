@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { toast } from "react-hot-toast";
 import {
   addProduct,
   getProducts,
@@ -20,6 +21,7 @@ function FarmerProducts() {
   // Product fields
   const [price, setPrice] = useState("");
   const [quantity, setQuantity] = useState("");
+  const [description, setDescription] = useState("");
 
   // Image
   const [images, setImages] = useState([]);
@@ -56,7 +58,7 @@ function FarmerProducts() {
   /* ---------------- Image Upload (Cloudinary) ---------------- */
   const uploadImages = async () => {
     if (!images.length) {
-      alert("Please select images");
+      toast.error("Please select images");
       return;
     }
 
@@ -69,7 +71,7 @@ function FarmerProducts() {
       formData.append("upload_preset", "greencart_products");
 
       const res = await fetch(
-        "https://api.cloudinary.com/v1_1/dizsy3fze/image/upload",
+        "https://api.cloudinary.com/v1_1/dsazooxny/image/upload",
         { method: "POST", body: formData }
       );
 
@@ -84,27 +86,61 @@ function FarmerProducts() {
   const handleAdd = (e) => {
     e.preventDefault();
 
-    if (!subcategoryId) return alert("Select subcategory");
-    if (!imageUrls.length) return alert("Upload product image");
+    // Validations
+    if (!subcategoryId) return toast.error("Select subcategory");
+
+    if (!description.trim()) {
+      return toast.error("Enter product description");
+    }
+
+    if (description.trim().length < 10) {
+      return toast.error("Description must be at least 10 characters long");
+    }
+
+    if (description.trim().length > 500) {
+      return toast.error("Description must not exceed 500 characters");
+    }
+
+    if (!price || parseFloat(price) <= 0) {
+      return toast.error("Enter a valid price greater than 0");
+    }
+
+    if (!quantity || parseInt(quantity) < 0) {
+      return toast.error("Enter a valid quantity (0 or more)");
+    }
+
+    if (!imageUrls.length) {
+      return toast.error("Upload product image");
+    }
 
     const payload = {
-      name: getSubcategoryName(), // ✅ product name = subcategory
-      price,
-      quantity,
-      categoryId,
-      subcategoryId,
-      images: imageUrls.map(url => ({ imageUrl: url }))
+      subCategoryId: parseInt(subcategoryId),
+      description: description.trim(),
+      price: parseFloat(price),
+      quantity: parseInt(quantity),
+      imageUrl: imageUrls[0] // Send first image URL
     };
+
+    console.log("Sending payload:", payload);
 
     addProduct(payload).then(() => {
       setPrice("");
       setQuantity("");
+      setDescription("");
       setCategoryId("");
       setSubcategoryId("");
       setSubcategories([]);
       setImages([]);
       setImageUrls([]);
       loadProducts();
+      alert("Product added successfully!");
+    }).catch(err => {
+      console.error("Error adding product:", err);
+      console.error("Error response:", err.response?.data);
+
+      // Show specific error message from backend
+      const errorMessage = err.response?.data?.message || err.response?.data || "Failed to add product. Please try again.";
+      toast.error(errorMessage);
     });
   };
 
@@ -144,12 +180,35 @@ function FarmerProducts() {
             </div>
           )}
 
+          {/* Description Field */}
+          <div className="form-group">
+            <label htmlFor="description" className="form-label">
+              📝 Product Description
+            </label>
+            <textarea
+              id="description"
+              className="description-input"
+              placeholder="Describe your product quality, origin, farming method, etc..."
+              value={description}
+              onChange={e => setDescription(e.target.value)}
+              rows="4"
+              required
+              minLength="10"
+              maxLength="500"
+            />
+            <small className="helper-text">
+              Provide details that help buyers understand your product better (10-500 characters)
+            </small>
+          </div>
+
           <div className="form-row">
             <input
               type="number"
               placeholder="Price (₹)"
               value={price}
               onChange={e => setPrice(e.target.value)}
+              step="0.01"
+              min="0.01"
               required
             />
             <input
@@ -157,6 +216,7 @@ function FarmerProducts() {
               placeholder="Quantity"
               value={quantity}
               onChange={e => setQuantity(e.target.value)}
+              min="0"
               required
             />
           </div>
@@ -200,23 +260,27 @@ function FarmerProducts() {
               <tr>
                 <th>Image</th>
                 <th>Product</th>
+                <th>Category</th>
                 <th>Price</th>
                 <th>Qty</th>
+                <th>Description</th>
               </tr>
             </thead>
             <tbody>
               {products.map(p => (
-                <tr key={p.id}>
+                <tr key={p.pid}>
                   <td>
                     <img
-                      src={p.images?.[0]?.imageUrl}
-                      alt=""
+                      src={p.imagePath}
+                      alt={p.pname}
                       className="table-img"
                     />
                   </td>
-                  <td>{p.name}</td>
+                  <td>{p.pname}</td>
+                  <td>{p.categoryName}</td>
                   <td>₹ {p.price}</td>
                   <td>{p.quantity}</td>
+                  <td className="description-cell">{p.description}</td>
                 </tr>
               ))}
             </tbody>

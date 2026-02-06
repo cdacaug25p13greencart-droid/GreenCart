@@ -5,19 +5,21 @@ import { login } from "../../redux/authSlice";
 import "./Login.css";
 
 export default function Login() {
+  // Local state
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [localError, setLocalError] = useState("");
 
+  // Hooks
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  // Redux state (FULL STATE FOR DEBUG)
-  const authState = useSelector((state) => state.auth);
-  // console.log("Redux Auth State:", authState);
+  // Redux state
+  const { isAuthenticated, role, loading, error } = useSelector(
+    (state) => state.auth
+  );
 
-  const { isAuthenticated, role, loading, error } = authState;
-
+  // Handle form submit
   const handleLogin = (e) => {
     e.preventDefault();
     setLocalError("");
@@ -38,24 +40,31 @@ export default function Login() {
       return;
     }
 
-    // Dispatch Redux async action
+    // Dispatch Redux async thunk
     dispatch(login({ username, password }));
   };
 
   // Redirect after successful login
   useEffect(() => {
+    console.log("🔄 Login redirect useEffect triggered:", { isAuthenticated, role });
+
     if (isAuthenticated && role) {
+      console.log(`✅ Authenticated as ${role}, navigating...`);
       switch (role) {
         case "ADMIN":
+          console.log("→ Navigating to /admin");
           navigate("/admin");
           break;
         case "FARMER":
+          console.log("→ Navigating to /farmer");
           navigate("/farmer");
           break;
         case "BUYER":
+          console.log("→ Navigating to /buyer/home");
           navigate("/buyer/home");
           break;
         default:
+          console.log("→ Unknown role, navigating to /");
           navigate("/");
       }
     }
@@ -63,49 +72,69 @@ export default function Login() {
 
   return (
     <div className="login-container">
-      <h2>Login</h2>
-      <br />
+      <form onSubmit={handleLogin} className="login-form">
+        <div className="login-header">
+          <div className="header-icon">🥗</div>
+          <h1 className="header-title">Welcome Back</h1>
+          <p className="header-subtitle">Sign in to your GreenCart account</p>
+        </div>
 
-      <form onSubmit={handleLogin}>
-        <label>Username</label>
-        <input
-          type="text"
-          placeholder="Username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-        />
+        {/* Username */}
+        <div className="input-group">
+          <label htmlFor="username">Username</label>
+          <input
+            id="username"
+            type="text"
+            placeholder="Enter your username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            autoComplete="username"
+          />
+        </div>
 
-        <label>Password</label>
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
+        {/* Password */}
+        <div className="input-group">
+          <label htmlFor="password">Password</label>
+          <input
+            id="password"
+            type="password"
+            placeholder="••••••••"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            autoComplete="current-password"
+          />
+        </div>
 
-        {/* Local validation error */}
+        {/* Frontend validation error */}
         {localError && (
-          <p style={{ color: "orange", marginBottom: "10px", fontSize: "14px" }}>
-            {localError}
-          </p>
+          <div className="error-message local">
+            <span>⚠️</span> {localError}
+          </div>
         )}
 
         {/* Backend / Redux error */}
         {error && (
-          <p style={{ color: "red", marginBottom: "10px", fontSize: "14px" }}>
+          <div className="error-message server">
+            <span>🚫</span>
             {error === "ACCOUNT_NOT_VERIFIED"
               ? "Your account is not yet verified by admin. Please wait for approval."
               : error}
-          </p>
+          </div>
         )}
 
+        {/* Submit */}
         <button type="submit" disabled={loading}>
-          {loading ? "Logging in..." : "Login"}
+          {loading ? "Verifying..." : "Sign In"}
         </button>
 
+        {/* Forgot password */}
         <Link to="/forgot-password" className="forgot-password-link">
           Forgot Password?
         </Link>
+
+        <div style={{ textAlign: 'center', marginTop: '1.5rem', fontSize: '0.9rem', color: '#666' }}>
+          Don't have an account? <Link to="/register" style={{ color: '#2e7d32', fontWeight: 700, textDecoration: 'none' }}>Sign Up</Link>
+        </div>
       </form>
     </div>
   );
